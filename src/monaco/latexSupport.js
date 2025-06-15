@@ -109,13 +109,32 @@ export function registerLatexLanguageSupport(monaco) {
 
       console.log('✅ Backslash detected, getting LaTeX items...');
 
-      const word = model.getWordUntilPosition(position);
-      const range = {
-        startLineNumber: position.lineNumber,
-        endLineNumber: position.lineNumber,
-        startColumn: word.startColumn,
-        endColumn: word.endColumn,
-      };
+      // 找到反斜杠后的位置，只替换反斜杠后面的内容
+      const lineContent = model.getLineContent(position.lineNumber);
+      const beforeCursor = lineContent.substring(0, position.column - 1);
+      const lastBackslashIndex = beforeCursor.lastIndexOf('\\');
+      
+      let range;
+      if (lastBackslashIndex !== -1) {
+        // 从反斜杠之后开始替换，保留反斜杠
+        range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: lastBackslashIndex + 2, // 跳过反斜杠
+          endColumn: position.column,
+        };
+      } else {
+        // 如果没有找到反斜杠，使用默认的word范围
+        const word = model.getWordUntilPosition(position);
+        range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+      }
+
+      console.log('� Replacement range:', range);
 
       try {
         // Get LaTeX completion items
@@ -123,21 +142,29 @@ export function registerLatexLanguageSupport(monaco) {
         console.log('📚 LaTeX items count:', latexItems.length);
         
         // Convert to Monaco completion items
-        const suggestions = latexItems.map(item => ({
-          label: item.label,
-          kind: getCompletionItemKind(monaco, item.kind),
-          insertText: item.insertText,
-          insertTextRules: item.insertTextRules === 'InsertAsSnippet' 
-            ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
-            : undefined,
-          documentation: item.documentation ? {
-            value: `${item.documentation}${item.detail ? `\n\n**Symbol:** ${item.detail}` : ''}`,
-            isTrusted: true
-          } : undefined,
-          detail: item.detail,
-          range: range,
-          sortText: getSortText(item.label, textUntilPosition)
-        }));
+        const suggestions = latexItems.map(item => {
+          // 如果insertText包含反斜杠，则去掉它，因为我们要保留用户已输入的反斜杠
+          let insertText = item.insertText;
+          if (insertText.startsWith('\\')) {
+            insertText = insertText.substring(1);
+          }
+          
+          return {
+            label: item.label,
+            kind: getCompletionItemKind(monaco, item.kind),
+            insertText: insertText,
+            insertTextRules: item.insertTextRules === 'InsertAsSnippet' 
+              ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
+              : undefined,
+            documentation: item.documentation ? {
+              value: `${item.documentation}${item.detail ? `\n\n**Symbol:** ${item.detail}` : ''}`,
+              isTrusted: true
+            } : undefined,
+            detail: item.detail,
+            range: range,
+            sortText: getSortText(item.label, textUntilPosition)
+          };
+        });
 
         console.log('🎯 Returning suggestions:', suggestions.length);
         console.log('📋 Sample suggestions:', suggestions.slice(0, 3).map(s => s.label));
