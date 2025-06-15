@@ -123,10 +123,10 @@ export const latexCompletionData = {
   operators: [
     { name: 'sum', snippet: 'sum_{${1:i=1}}^{${2:n}} ${3}', symbol: '∑', description: 'Summation' },
     { name: 'prod', snippet: 'prod_{${1:i=1}}^{${2:n}} ${3}', symbol: '∏', description: 'Product' },
-    { name: 'int', snippet: 'int_{${1:a}}^{${2:b}} ${3} \\, d${4:x}', symbol: '∫', description: 'Integral' },
-    { name: 'iint', snippet: 'iint_{${1:D}} ${2} \\, d${3:x} \\, d${4:y}', symbol: '∬', description: 'Double integral' },
-    { name: 'iiint', snippet: 'iiint_{${1:D}} ${2} \\, d${3:x} \\, d${4:y} \\, d${5:z}', symbol: '∭', description: 'Triple integral' },
-    { name: 'oint', snippet: 'oint_{${1:C}} ${2} \\, d${3:s}', symbol: '∮', description: 'Contour integral' },
+    { name: 'int', snippet: 'int_{${1:a}}^{${2:b}} ${3} \\, \\mathrm{d}${4:x}', symbol: '∫', description: 'Integral with upright d' },
+    { name: 'iint', snippet: 'iint_{${1:D}} ${2} \\, \\mathrm{d}${3:x} \\, \\mathrm{d}${4:y}', symbol: '∬', description: 'Double integral with upright d' },
+    { name: 'iiint', snippet: 'iiint_{${1:D}} ${2} \\, \\mathrm{d}${3:x} \\, \\mathrm{d}${4:y} \\, \\mathrm{d}${5:z}', symbol: '∭', description: 'Triple integral with upright d' },
+    { name: 'oint', snippet: 'oint_{${1:C}} ${2} \\, \\mathrm{d}${3:s}', symbol: '∮', description: 'Contour integral with upright d' },
     { name: 'lim', snippet: 'lim_{${1:x \\to \\infty}} ${2}', description: 'Limit' },
     { name: 'limsup', snippet: 'limsup_{${1:n \\to \\infty}} ${2}', description: 'Superior limit' },
     { name: 'liminf', snippet: 'liminf_{${1:n \\to \\infty}} ${2}', description: 'Inferior limit' },
@@ -419,6 +419,35 @@ export const latexCompletionData = {
     { name: 'lg', description: 'Base 2 logarithm' },
     { name: 'exp', description: 'Exponential function' },
     { name: 'operatorname', snippet: 'operatorname{${1:name}}', description: 'Operator name' },
+    // 微分和积分相关的正体符号
+    { name: 'mathrm', snippet: 'mathrm{${1:text}}', description: 'Roman (upright) text in math mode' },
+    { name: 'd', snippet: '\\mathrm{d}', description: 'Differential d (upright)', symbol: 'd' },
+    { name: 'dx', snippet: '\\mathrm{d}x', description: 'dx differential', symbol: 'dx' },
+    { name: 'dy', snippet: '\\mathrm{d}y', description: 'dy differential', symbol: 'dy' },
+    { name: 'dz', snippet: '\\mathrm{d}z', description: 'dz differential', symbol: 'dz' },
+    { name: 'dt', snippet: '\\mathrm{d}t', description: 'dt differential', symbol: 'dt' },
+    { name: 'dr', snippet: '\\mathrm{d}r', description: 'dr differential', symbol: 'dr' },
+    { name: 'dtheta', snippet: '\\mathrm{d}\\theta', description: 'dθ differential', symbol: 'dθ' },
+    { name: 'dphi', snippet: '\\mathrm{d}\\phi', description: 'dφ differential', symbol: 'dφ' },
+    // 常用的正体常数和函数
+    { name: 'e', snippet: '\\mathrm{e}', description: 'Euler\'s number (upright)', symbol: 'e' },
+    { name: 'i', snippet: '\\mathrm{i}', description: 'Imaginary unit (upright)', symbol: 'i' },
+    { name: 'j', snippet: '\\mathrm{j}', description: 'Imaginary unit j (upright)', symbol: 'j' },
+  ],
+
+  // 数学常数和单位（正体）
+  constants: [
+    { name: 'pi', symbol: 'π', description: 'Pi (use \\mathrm for upright)' },
+    { name: 'uppi', snippet: '{\\mathrm{\\pi}}', symbol: 'π', description: 'Upright pi' },
+    { name: 'upe', snippet: '{\\mathrm{e}}', symbol: 'e', description: 'Upright Euler number' },
+    { name: 'upi', snippet: '{\\mathrm{i}}', symbol: 'i', description: 'Upright imaginary unit' },
+    { name: 'upj', snippet: '{\\mathrm{j}}', symbol: 'j', description: 'Upright imaginary unit j' },
+    { name: 'kg', snippet: '\\,\\mathrm{kg}', description: 'Kilogram unit (upright)' },
+    { name: 'm', snippet: '\\,\\mathrm{m}', description: 'Meter unit (upright)' },
+    { name: 's', snippet: '\\,\\mathrm{s}', description: 'Second unit (upright)' },
+    { name: 'mol', snippet: '\\,\\mathrm{mol}', description: 'Mole unit (upright)' },
+    { name: 'rad', snippet: '\\,\\mathrm{rad}', description: 'Radian unit (upright)' },
+    { name: 'deg', snippet: '^\\circ', description: 'Degree symbol' },
   ],
 
   // 数学字体
