@@ -2,49 +2,8 @@
 // Provides completion, syntax highlighting, and auto-pairing for LaTeX in MDX/Markdown files
 // Based on data structure from LaTeX Workshop project
 
-// 内嵌LaTeX补全数据以避免模块导入问题
-const latexCompletionItems = [
-  // 基本数学符号
-  { label: '\\alpha', insertText: 'alpha', detail: 'α', documentation: 'Greek letter alpha', kind: 'Function' },
-  { label: '\\beta', insertText: 'beta', detail: 'β', documentation: 'Greek letter beta', kind: 'Function' },
-  { label: '\\gamma', insertText: 'gamma', detail: 'γ', documentation: 'Greek letter gamma', kind: 'Function' },
-  { label: '\\delta', insertText: 'delta', detail: 'δ', documentation: 'Greek letter delta', kind: 'Function' },
-  { label: '\\epsilon', insertText: 'epsilon', detail: 'ε', documentation: 'Greek letter epsilon', kind: 'Function' },
-  { label: '\\sum', insertText: 'sum_{${1:i=1}}^{${2:n}} ${3}', detail: '∑', documentation: 'Summation', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\int', insertText: 'int_{${1:a}}^{${2:b}} ${3} \\, d${4:x}', detail: '∫', documentation: 'Integral', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\frac', insertText: 'frac{${1:numerator}}{${2:denominator}}', detail: 'fraction', documentation: 'Fraction', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\sqrt', insertText: 'sqrt{${1:expression}}', detail: '√', documentation: 'Square root', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\lim', insertText: 'lim_{${1:x \\to \\infty}} ${2}', detail: 'limit', documentation: 'Limit', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\sin', insertText: 'sin', detail: 'sine', documentation: 'Sine function', kind: 'Function' },
-  { label: '\\cos', insertText: 'cos', detail: 'cosine', documentation: 'Cosine function', kind: 'Function' },
-  { label: '\\tan', insertText: 'tan', detail: 'tangent', documentation: 'Tangent function', kind: 'Function' },
-  { label: '\\log', insertText: 'log', detail: 'logarithm', documentation: 'Logarithm', kind: 'Function' },
-  { label: '\\ln', insertText: 'ln', detail: 'natural log', documentation: 'Natural logarithm', kind: 'Function' },
-  { label: '\\infty', insertText: 'infty', detail: '∞', documentation: 'Infinity', kind: 'Function' },
-  { label: '\\pi', insertText: 'pi', detail: 'π', documentation: 'Pi', kind: 'Function' },
-  { label: '\\theta', insertText: 'theta', detail: 'θ', documentation: 'Greek letter theta', kind: 'Function' },
-  { label: '\\lambda', insertText: 'lambda', detail: 'λ', documentation: 'Greek letter lambda', kind: 'Function' },
-  { label: '\\mu', insertText: 'mu', detail: 'μ', documentation: 'Greek letter mu', kind: 'Function' },
-  { label: '\\sigma', insertText: 'sigma', detail: 'σ', documentation: 'Greek letter sigma', kind: 'Function' },
-  { label: '\\phi', insertText: 'phi', detail: 'φ', documentation: 'Greek letter phi', kind: 'Function' },
-  { label: '\\omega', insertText: 'omega', detail: 'ω', documentation: 'Greek letter omega', kind: 'Function' },
-  { label: '\\leftarrow', insertText: 'leftarrow', detail: '←', documentation: 'Left arrow', kind: 'Function' },
-  { label: '\\rightarrow', insertText: 'rightarrow', detail: '→', documentation: 'Right arrow', kind: 'Function' },
-  { label: '\\Rightarrow', insertText: 'Rightarrow', detail: '⇒', documentation: 'Right double arrow', kind: 'Function' },
-  { label: '\\leq', insertText: 'leq', detail: '≤', documentation: 'Less than or equal', kind: 'Function' },
-  { label: '\\geq', insertText: 'geq', detail: '≥', documentation: 'Greater than or equal', kind: 'Function' },
-  { label: '\\neq', insertText: 'neq', detail: '≠', documentation: 'Not equal', kind: 'Function' },
-  { label: '\\approx', insertText: 'approx', detail: '≈', documentation: 'Approximately equal', kind: 'Function' },
-  { label: '\\in', insertText: 'in', detail: '∈', documentation: 'Element of', kind: 'Function' },
-  { label: '\\subset', insertText: 'subset', detail: '⊂', documentation: 'Subset', kind: 'Function' },
-  { label: '\\cap', insertText: 'cap', detail: '∩', documentation: 'Intersection', kind: 'Function' },
-  { label: '\\cup', insertText: 'cup', detail: '∪', documentation: 'Union', kind: 'Function' },
-  { label: '\\mathbb', insertText: 'mathbb{${1:text}}', detail: 'blackboard bold', documentation: 'Blackboard bold', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\mathbf', insertText: 'mathbf{${1:text}}', detail: 'bold', documentation: 'Bold face', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\mathcal', insertText: 'mathcal{${1:text}}', detail: 'calligraphic', documentation: 'Calligraphic', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-  { label: '\\text', insertText: 'text{${1:text}}', detail: 'text', documentation: 'Text in math mode', kind: 'Function', insertTextRules: 'InsertAsSnippet' },
-];
-
+// 导入LaTeX数据
+import { getLatexCompletionItems } from './latexData.js';
 // 为Editor.js提供的接口函数
 let latexSupportDisposable = null;
 
@@ -63,9 +22,15 @@ export function initializeLatexSupport(editor, monaco) {
   }
   
   // 测试LaTeX数据是否正确加载
-  console.log('LaTeX items loaded:', latexCompletionItems.length, 'items');
-  if (latexCompletionItems.length > 0) {
-    console.log('First few items:', latexCompletionItems.slice(0, 3));
+  console.log('Testing LaTeX data loading...');
+  try {
+    const testItems = getLatexCompletionItems();
+    console.log('LaTeX items loaded:', testItems.length, 'items');
+    if (testItems.length > 0) {
+      console.log('First few items:', testItems.slice(0, 3).map(item => item.label));
+    }
+  } catch (error) {
+    console.error('Failed to load LaTeX items:', error);
   }
   
   if (latexSupportDisposable) {
@@ -98,14 +63,34 @@ export function disposeLatexSupport() {
  * @param {import('monaco-editor').editor} monaco - Monaco editor instance
  */
 export function registerLatexLanguageSupport(monaco) {
-  console.log('Registering LaTeX language support...');
+  console.log('=== REGISTERING LATEX SUPPORT ===');
+  
+  // 测试导入的函数
+  console.log('Testing getLatexCompletionItems function:', typeof getLatexCompletionItems);
+  
+  try {
+    const testItems = getLatexCompletionItems();
+    console.log('✅ Successfully loaded LaTeX items:', testItems.length);
+    if (testItems.length > 0) {
+      console.log('📄 Sample items:', testItems.slice(0, 5).map(item => ({
+        label: item.label,
+        detail: item.detail
+      })));
+    }
+  } catch (error) {
+    console.error('❌ Failed to load LaTeX items:', error);
+    return { dispose: () => {} };
+  }
   
   // Register LaTeX completion provider for MDX/Markdown files
   const completionProvider = monaco.languages.registerCompletionItemProvider(['markdown'], {
-    triggerCharacters: ['\\', 'a'],  // 添加'a'作为测试触发字符
+    triggerCharacters: ['\\'],
     
     provideCompletionItems: (model, position, context) => {
-      console.log('LaTeX completion triggered!', { position, context });
+      console.log('🚀 LaTeX completion triggered!', { 
+        position: { line: position.lineNumber, column: position.column },
+        context: context.triggerKind 
+      });
       
       const textUntilPosition = model.getValueInRange({
         startLineNumber: position.lineNumber,
@@ -114,13 +99,15 @@ export function registerLatexLanguageSupport(monaco) {
         endColumn: position.column,
       });
 
-      console.log('Text until position:', textUntilPosition);
+      console.log('📝 Text until position:', JSON.stringify(textUntilPosition));
 
       // 检查是否输入了反斜杠
       if (!textUntilPosition.includes('\\')) {
-        console.log('No backslash found, returning empty suggestions');
+        console.log('❌ No backslash found, returning empty suggestions');
         return { suggestions: [] };
       }
+
+      console.log('✅ Backslash detected, getting LaTeX items...');
 
       const word = model.getWordUntilPosition(position);
       const range = {
@@ -130,29 +117,35 @@ export function registerLatexLanguageSupport(monaco) {
         endColumn: word.endColumn,
       };
 
-      // Get LaTeX completion items
-      const latexItems = latexCompletionItems;
-      console.log('LaTeX items count:', latexItems.length);
-      
-      // Convert to Monaco completion items (限制数量避免性能问题)
-      const suggestions = latexItems.slice(0, 20).map(item => ({
-        label: item.label,
-        kind: getCompletionItemKind(monaco, item.kind),
-        insertText: item.insertText,
-        insertTextRules: item.insertTextRules === 'InsertAsSnippet' 
-          ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
-          : undefined,
-        documentation: item.documentation ? {
-          value: `${item.documentation}${item.detail ? `\n\n**Symbol:** ${item.detail}` : ''}`,
-          isTrusted: true
-        } : undefined,
-        detail: item.detail,
-        range: range,
-        sortText: getSortText(item.label, textUntilPosition)
-      }));
+      try {
+        // Get LaTeX completion items
+        const latexItems = getLatexCompletionItems();
+        console.log('📚 LaTeX items count:', latexItems.length);
+        
+        // Convert to Monaco completion items
+        const suggestions = latexItems.map(item => ({
+          label: item.label,
+          kind: getCompletionItemKind(monaco, item.kind),
+          insertText: item.insertText,
+          insertTextRules: item.insertTextRules === 'InsertAsSnippet' 
+            ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet 
+            : undefined,
+          documentation: item.documentation ? {
+            value: `${item.documentation}${item.detail ? `\n\n**Symbol:** ${item.detail}` : ''}`,
+            isTrusted: true
+          } : undefined,
+          detail: item.detail,
+          range: range,
+          sortText: getSortText(item.label, textUntilPosition)
+        }));
 
-      console.log('Returning suggestions:', suggestions.length);
-      return { suggestions };
+        console.log('🎯 Returning suggestions:', suggestions.length);
+        console.log('📋 Sample suggestions:', suggestions.slice(0, 3).map(s => s.label));
+        return { suggestions };
+      } catch (error) {
+        console.error('❌ Error getting LaTeX completion items:', error);
+        return { suggestions: [] };
+      }
     }
   });
 
@@ -169,7 +162,7 @@ export function registerLatexLanguageSupport(monaco) {
         return null;
       }
 
-      const latexItems = latexCompletionItems;
+      const latexItems = getLatexCompletionItems();
       const item = latexItems.find(item => item.label === word.word);
       
       if (item && item.documentation) {
