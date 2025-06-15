@@ -1,0 +1,45 @@
+---
+title: LaTeX Math Test
+displaystyle: true
+---
+
+# LaTeX 数学公式测试
+
+这个文件用于测试Monaco编辑器中的LaTeX自动补全和配对功能。
+
+## 行内数学公式
+
+这是一个简单的行内公式：$x = y + z$
+
+这是包含希腊字母的公式：$\alpha + \beta = \gamma$
+
+## 块级数学公式
+
+这是一个块级数学公式：
+
+$$\sum_{i=1}^{n} x_i = \int_{0}^{1} f(x) dx$$
+
+## 复杂公式示例
+
+二次公式：
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+积分公式：
+$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$
+
+矩阵：
+$$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$$
+
+## 测试说明
+
+1. 输入单个 `$` 应该自动补全另一个 `$`
+2. 输入 `$$` 应该自动补全另一个 `$$`，形成块级公式
+3. 在数学公式内部应该有LaTeX命令的自动补全
+4. LaTeX命令应该有语法高亮
+
+尝试输入以下内容来测试自动补全：
+- `\sum` - 求和符号
+- `\int` - 积分符号  
+- `\frac` - 分数
+- `\alpha` - 希腊字母
+- `\sqrt` - 平方根
