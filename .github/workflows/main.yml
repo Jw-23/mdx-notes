@@ -1,0 +1,98 @@
+name: 'Publish'
+on:
+  push:
+    tags: [v*]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+            arch: 'aarch64'
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+            arch: 'x86_64'
+          - platform: 'ubuntu-22.04'
+            args: ''
+            arch: 'x86_64'
+          - platform: 'windows-latest'
+            args: ''
+            arch: 'x86_64'
+
+    runs-on: ${{ matrix.settings.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (ubuntu only)
+        if: matrix.settings.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.settings.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Debug info
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Rust version: $(rustc --version)"
+          echo "Cargo version: $(cargo --version)"
+          echo "Package.json scripts:"
+          cat package.json | grep -A 10 "scripts"
+          echo "Tauri info:"
+          npm run tauri info || true
+
+      - name: Build Tauri app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          echo "Building for platform: ${{ matrix.settings.platform }}"
+          echo "Build args: ${{ matrix.settings.args }}"
+          
+          if [ "${{ matrix.settings.args }}" != "" ]; then
+            npm run tauri build -- ${{ matrix.settings.args }}
+          else
+            npm run tauri build
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.settings.platform }}-${{ matrix.settings.arch }}
+          path: |
+            src-tauri/target/release/bundle/
+            src-tauri/target/*/release/bundle/
