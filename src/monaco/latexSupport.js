@@ -213,6 +213,14 @@ export function registerLatexLanguageSupport(monaco) {
   });  // Register auto-closing pairs for math environments
   monaco.languages.setLanguageConfiguration('markdown', {
     autoClosingPairs: [
+      // 保留默认的括号配对
+      { open: '(', close: ')' },
+      { open: '[', close: ']' },
+      { open: '{', close: '}' },
+      { open: '"', close: '"' },
+      { open: "'", close: "'" },
+      { open: '`', close: '`' },
+      // 添加LaTeX特有的配对
       { open: '$', close: '$', notIn: ['string', 'comment'] },
       { open: '\\(', close: '\\)', notIn: ['string', 'comment'] },
       { open: '\\[', close: '\\]', notIn: ['string', 'comment'] },
@@ -221,12 +229,20 @@ export function registerLatexLanguageSupport(monaco) {
       { open: '^{', close: '}', notIn: ['string', 'comment'] }
     ],
     surroundingPairs: [
+      { open: '(', close: ')' },
+      { open: '[', close: ']' },
+      { open: '{', close: '}' },
+      { open: '"', close: '"' },
+      { open: "'", close: "'" },
+      { open: '`', close: '`' },
       { open: '$', close: '$' },
       { open: '\\(', close: '\\)' },
       { open: '\\[', close: '\\]' },
       { open: '\\{', close: '\\}' }
     ]
   });
+
+  console.log('✅ Auto-closing pairs configured for markdown');
 
   return {
     dispose: () => {
